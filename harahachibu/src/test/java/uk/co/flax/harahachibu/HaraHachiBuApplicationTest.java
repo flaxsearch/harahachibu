@@ -17,11 +17,14 @@ package uk.co.flax.harahachibu;
 
 import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
+import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
-import uk.co.flax.harahachbu.HaraHachiBuApplication;
-import uk.co.flax.harahachbu.HaraHachiBuConfiguration;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterRegistration;
+import javax.servlet.ServletRegistration;
 
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
@@ -36,6 +39,8 @@ import static org.mockito.Mockito.when;
 public class HaraHachiBuApplicationTest {
 
 	private final Environment environment = mock(Environment.class);
+	private final ServletEnvironment servlets = mock(ServletEnvironment.class);
+	private final FilterRegistration.Dynamic filterDynamic = mock(FilterRegistration.Dynamic.class);
 	private final JerseyEnvironment jersey = mock(JerseyEnvironment.class);
 	private final HealthCheckRegistry healthChecks = mock(HealthCheckRegistry.class);
 	private final HaraHachiBuApplication application = new HaraHachiBuApplication();
@@ -43,13 +48,15 @@ public class HaraHachiBuApplicationTest {
 
 	@Before
 	public void setup() throws Exception {
+		when(environment.servlets()).thenReturn(servlets);
+		when(servlets.addFilter(isA(String.class), isA(Filter.class))).thenReturn(filterDynamic);
 		when(environment.jersey()).thenReturn(jersey);
 		when(environment.healthChecks()).thenReturn(healthChecks);
 	}
 
 
 	@Test
-	public void buildsIndexResource() throws Exception {
+	public void buildsServlets() throws Exception {
 		application.run(config, environment);
 	}
 

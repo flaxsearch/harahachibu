@@ -13,14 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.flax.harahachbu;
-
-import io.dropwizard.Configuration;
+package uk.co.flax.harahachibu.services;
 
 /**
- * Base configuration class for the Hara Hachi Bu proxy application.
+ * Exception class to indicate issues when checking disk space.
  *
  * Created by mlp on 13/04/16.
  */
-public class HaraHachiBuConfiguration extends Configuration {
+public class DiskSpaceCheckerException extends Exception {
+
+	public DiskSpaceCheckerException() {
+		super();
+	}
+
+	public DiskSpaceCheckerException(String message) {
+		super(message);
+	}
+
+	public DiskSpaceCheckerException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
+	public DiskSpaceCheckerException(Throwable cause) {
+		super(cause);
+	}
+
 }

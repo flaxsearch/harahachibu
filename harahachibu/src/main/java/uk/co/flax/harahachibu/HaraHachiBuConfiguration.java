@@ -13,25 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package uk.co.flax.harahachbu;
+package uk.co.flax.harahachibu;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
+import io.dropwizard.Configuration;
+import uk.co.flax.harahachibu.config.ProxyConfiguration;
 
 /**
- * Main application class for Hara Hachi Bu proxy application.
+ * Base configuration class for the Hara Hachi Bu proxy application.
  *
  * Created by mlp on 13/04/16.
  */
-public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration> {
+public class HaraHachiBuConfiguration extends Configuration {
 
-	@Override
-	public void run(HaraHachiBuConfiguration haraHachiBuConfiguration, Environment environment) throws Exception {
+	private ProxyConfiguration proxy;
 
+	public ProxyConfiguration getProxy() {
+		return proxy;
 	}
 
-	public static void main(String[] args) throws Exception {
-		new HaraHachiBuApplication().run(args);
+	public void setProxy(ProxyConfiguration proxy) {
+		this.proxy = proxy;
 	}
-
 }
