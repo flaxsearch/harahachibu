@@ -21,6 +21,7 @@ import io.dropwizard.jetty.setup.ServletEnvironment;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
+import uk.co.flax.harahachibu.config.ProxyConfiguration;
 import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
 import javax.servlet.Filter;
@@ -48,6 +49,7 @@ public class HaraHachiBuApplicationTest {
 	private final HealthCheckRegistry healthChecks = mock(HealthCheckRegistry.class);
 	private final HaraHachiBuApplication application = new HaraHachiBuApplication();
 	private final HaraHachiBuConfiguration config = new HaraHachiBuConfiguration();
+	private final ProxyConfiguration proxyConfiguration = new ProxyConfiguration();
 
 	@Before
 	public void setup() throws Exception {
@@ -56,6 +58,9 @@ public class HaraHachiBuApplicationTest {
 		when(servlets.addServlet(eq("diskSpaceProxyServlet"), isA(DiskSpaceProxyServlet.class))).thenReturn(servletDynamic);
 		when(environment.jersey()).thenReturn(jersey);
 		when(environment.healthChecks()).thenReturn(healthChecks);
+
+		// Config
+		config.setProxy(proxyConfiguration);
 	}
 
 

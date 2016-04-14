@@ -17,6 +17,7 @@ package uk.co.flax.harahachibu;
 
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
+import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.servlets.DiskSpaceFilter;
 import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
@@ -33,8 +34,7 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 
 	@Override
 	public void run(HaraHachiBuConfiguration config, Environment environment) throws Exception {
-		environment.servlets().setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
-
+		// Set up the disk space filter
 		environment.servlets()
 				.addFilter("diskSpaceFilter", new DiskSpaceFilter(null, config.getProxy(), "/set"))
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
@@ -43,6 +43,8 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
 		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
 		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
+
+		environment.jersey().register(new SetSpaceResource());
 	}
 
 	public static void main(String[] args) throws Exception {
