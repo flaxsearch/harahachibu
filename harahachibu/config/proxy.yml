@@ -1,0 +1,48 @@
+# HTTP configuration
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+
+  adminConnectors:
+    - type: http
+      port: 8081
+
+  # Define request logging
+  requestLog:
+    timeZone: UTC
+    appenders:
+      # Settings for logging to a file.
+      - type: file
+
+        # The time zone in which dates should be displayed.
+        timeZone: UTC
+
+        # The file to which statements will be logged.
+        #
+        # If enabled is true, this must be specified.
+        currentLogFilename: logs/harahachibu_request.log
+
+        # When the log file rolls over, the file will be archived to
+        # app-2012-03-15.log.gz, example.log will be truncated,
+        # and new statements written to it.
+        #
+        # If archive is true, this must be specified.
+        archivedLogFilenamePattern: logs/harahachibu_request-%d.log.gz
+
+        # The maximum number of log files to archive.
+        archivedFileCount: 5
+
+
+# Proxy configuration details
+proxy:
+
+  # Status code to return when disk is full (default: 500)
+  errorStatus: 500
+
+  # List of URLs which should trigger a disk space check
+  checkUrls:
+    - /solr/update
+
+  # The proxy destination server prefix
+  destinationServer: http://localhost:8983

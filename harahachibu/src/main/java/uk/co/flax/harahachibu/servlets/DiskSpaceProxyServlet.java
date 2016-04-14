@@ -30,9 +30,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class DiskSpaceProxyServlet extends ProxyServlet {
 
-	static final String PROXY_PATH_PREFIX = "/proxy";
+	public static final String PROXY_PATH_PREFIX = "/proxy";
 
-	static final String DESTINATION_SERVER_PARAM = "destinationServerPrefix";
+	public static final String DESTINATION_SERVER_PARAM = "destinationServerPrefix";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DiskSpaceProxyServlet.class);
 

@@ -18,8 +18,10 @@ package uk.co.flax.harahachibu;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Environment;
 import uk.co.flax.harahachibu.servlets.DiskSpaceFilter;
+import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.ServletRegistration;
 import java.util.EnumSet;
 
 /**
@@ -31,12 +33,16 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 
 	@Override
 	public void run(HaraHachiBuConfiguration config, Environment environment) throws Exception {
+		environment.servlets().setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
+
 		environment.servlets()
 				.addFilter("diskSpaceFilter", new DiskSpaceFilter(null, config.getProxy(), "/set"))
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-//		environment.servlets().addServlet("diskSpaceProxyServlet",
-//				new DiskSpaceProxyServlet(config.getProxy()))
-//				.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
+
+		// Set up the proxy servlet - requires some additional configuration
+		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
+		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
+		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
 	}
 
 	public static void main(String[] args) throws Exception {
