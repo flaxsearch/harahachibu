@@ -55,7 +55,7 @@ public class DiskSpaceFilterTest {
 
 	@Test
 	public void passThroughLocalPath() throws Exception {
-		final String requestUri = "http://localhost:8080" + localPaths[0];
+		final String requestUri = localPaths[0];
 
 		final HttpServletRequest req = mock(HttpServletRequest.class);
 		when(req.getRequestURI()).thenReturn(requestUri);
@@ -67,15 +67,14 @@ public class DiskSpaceFilterTest {
 		filter.doFilter(req, response, chain);
 
 		verify(req).getRequestURI();
-		verify(req).getContextPath();
 		verify(chain).doFilter(req, response);
 	}
 
 	@Test
 	public void proxyWithoutCheckingState() throws Exception {
-		final String requestUri = "http://localhost:8080/solr/select";
+		final String requestUri = "/solr/select";
 		final String requestQuery = "q=test";
-		final String proxiedUri = "http://localhost:8080" + DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/solr/select?" + requestQuery;
+		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/solr/select?" + requestQuery;
 
 		final RequestDispatcher dispatcher = mock(RequestDispatcher.class);
 		final HttpServletRequest req = mock(HttpServletRequest.class);
@@ -90,7 +89,6 @@ public class DiskSpaceFilterTest {
 		filter.doFilter(req, response, chain);
 
 		verify(req, atLeastOnce()).getRequestURI();
-		verify(req, atLeastOnce()).getContextPath();
 		verify(req, atLeastOnce()).getQueryString();
 		verify(req).getRequestDispatcher(proxiedUri);
 		verify(dispatcher).forward(req, response);
@@ -100,7 +98,7 @@ public class DiskSpaceFilterTest {
 	public void returnErrorWhenDiskCheckFails() throws Exception {
 		when(checker.isSpaceAvailable()).thenThrow(new DiskSpaceCheckerException("Error"));
 
-		final String requestUri = "http://localhost:8080/solr/update";
+		final String requestUri = "/solr/update";
 		final HttpServletRequest req = mock(HttpServletRequest.class);
 		when(req.getRequestURI()).thenReturn(requestUri);
 		when(req.getContextPath()).thenReturn("");
@@ -113,7 +111,6 @@ public class DiskSpaceFilterTest {
 		filter.doFilter(req, response, chain);
 
 		verify(req, atLeastOnce()).getRequestURI();
-		verify(req, atLeastOnce()).getContextPath();
 		verify(response).sendError(errorCode);
 	}
 
@@ -121,7 +118,7 @@ public class DiskSpaceFilterTest {
 	public void returnErrorWhenDiskFull() throws Exception {
 		when(checker.isSpaceAvailable()).thenReturn(false);
 
-		final String requestUri = "http://localhost:8080/solr/update";
+		final String requestUri = "/solr/update";
 		final HttpServletRequest req = mock(HttpServletRequest.class);
 		when(req.getRequestURI()).thenReturn(requestUri);
 		when(req.getContextPath()).thenReturn("");
@@ -134,7 +131,6 @@ public class DiskSpaceFilterTest {
 		filter.doFilter(req, response, chain);
 
 		verify(req, atLeastOnce()).getRequestURI();
-		verify(req, atLeastOnce()).getContextPath();
 		verify(response).sendError(errorCode);
 	}
 
@@ -142,9 +138,9 @@ public class DiskSpaceFilterTest {
 	public void proxyWhenStateCheckPasses() throws Exception {
 		when(checker.isSpaceAvailable()).thenReturn(true);
 
-		final String requestUri = "http://localhost:8080/solr/update";
+		final String requestUri = "/solr/update";
 		final String requestQuery = "q=test";
-		final String proxiedUri = "http://localhost:8080" + DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/solr/update?" + requestQuery;
+		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/solr/update?" + requestQuery;
 
 		final RequestDispatcher dispatcher = mock(RequestDispatcher.class);
 		final HttpServletRequest req = mock(HttpServletRequest.class);
@@ -159,7 +155,6 @@ public class DiskSpaceFilterTest {
 		filter.doFilter(req, response, chain);
 
 		verify(req, atLeastOnce()).getRequestURI();
-		verify(req, atLeastOnce()).getContextPath();
 		verify(req, atLeastOnce()).getQueryString();
 		verify(req).getRequestDispatcher(proxiedUri);
 		verify(dispatcher).forward(req, response);

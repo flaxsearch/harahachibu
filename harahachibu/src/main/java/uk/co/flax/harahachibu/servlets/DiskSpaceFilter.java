@@ -25,8 +25,6 @@ import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Filter run on all incoming requests.
@@ -48,8 +46,6 @@ import java.util.regex.Pattern;
 public class DiskSpaceFilter implements Filter {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DiskSpaceFilter.class);
-
-	private static final Pattern PATH_PATTERN = Pattern.compile("https?://[^/]+(/.*)");
 
 	private final DiskSpaceChecker spaceChecker;
 	private final ProxyConfiguration proxyConfiguration;
@@ -98,7 +94,7 @@ public class DiskSpaceFilter implements Filter {
 	private boolean isUriInLocalPaths(HttpServletRequest request) {
 		boolean ret = false;
 
-		final String path = getPath(request);
+		final String path = request.getRequestURI();
 		if (path != null && localPaths != null) {
 			for (String localPath : localPaths) {
 				if (path.startsWith(localPath)) {
@@ -114,7 +110,7 @@ public class DiskSpaceFilter implements Filter {
 	private boolean isUriInCheckPaths(HttpServletRequest request) {
 		boolean ret = false;
 
-		final String path = getPath(request);
+		final String path = request.getRequestURI();
 		if (path != null) {
 			for (String checkPath : proxyConfiguration.getCheckUrls()) {
 				if (path.startsWith(checkPath)) {
@@ -128,33 +124,14 @@ public class DiskSpaceFilter implements Filter {
 	}
 
 	private String getProxyPath(HttpServletRequest request) {
-		final String path = getPath(request);
 		final String uri = request.getRequestURI();
-		final String pathStart = uri.substring(0, uri.length() - path.length());
 
-		StringBuilder pathBuilder = new StringBuilder(pathStart)
-				.append(DiskSpaceProxyServlet.PROXY_PATH_PREFIX)
-				.append(path);
+		StringBuilder pathBuilder = new StringBuilder(DiskSpaceProxyServlet.PROXY_PATH_PREFIX)
+				.append(uri);
 		if (request.getQueryString() != null) {
 			pathBuilder.append("?").append(request.getQueryString());
 		}
 		return pathBuilder.toString();
-	}
-
-	/**
-	 * Get the request path, excluding the server context.
-	 *
-	 * @param request the HTTP request.
-	 * @return the path, or <code>null</code> if the path does not
-	 * match the expected pattern.
-	 */
-	private String getPath(HttpServletRequest request) {
-		Matcher m = PATH_PATTERN.matcher(request.getRequestURI());
-		if (m.matches()) {
-			return m.group(1).substring(request.getContextPath().length());
-		}
-
-		return null;
 	}
 
 	@Override
