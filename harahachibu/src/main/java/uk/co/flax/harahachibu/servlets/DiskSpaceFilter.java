@@ -69,6 +69,7 @@ public class DiskSpaceFilter implements Filter {
 
 		if (isUriInLocalPaths(httpRequest)) {
 			// Ignore and pass through
+			LOGGER.debug("Passing through request for {}", httpRequest.getRequestURI());
 			chain.doFilter(request, response);
 		} else {
 			if (isUriInCheckPaths(httpRequest)) {
@@ -113,7 +114,7 @@ public class DiskSpaceFilter implements Filter {
 		final String path = request.getRequestURI();
 		if (path != null) {
 			for (String checkPath : proxyConfiguration.getCheckUrls()) {
-				if (path.startsWith(checkPath)) {
+				if (path.matches(checkPath)) {
 					ret = true;
 					break;
 				}

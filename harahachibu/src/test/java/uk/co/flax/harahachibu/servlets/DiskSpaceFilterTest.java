@@ -26,6 +26,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class DiskSpaceFilterTest {
 
 	private final DiskSpaceChecker checker = mock(DiskSpaceChecker.class);
 	private final ProxyConfiguration proxyConfig = mock(ProxyConfiguration.class);
-	private final List<String> checkUrls = Collections.singletonList("/solr/update");
+	private final List<String> checkUrls = Arrays.asList("/solr/update", "/solr/.*/update");
 	private final String[] localPaths = new String[]{ "/set" };
 	private final int errorCode = 500;
 
@@ -66,7 +67,7 @@ public class DiskSpaceFilterTest {
 
 		filter.doFilter(req, response, chain);
 
-		verify(req).getRequestURI();
+		verify(req, atLeastOnce()).getRequestURI();
 		verify(chain).doFilter(req, response);
 	}
 
@@ -138,9 +139,9 @@ public class DiskSpaceFilterTest {
 	public void proxyWhenStateCheckPasses() throws Exception {
 		when(checker.isSpaceAvailable()).thenReturn(true);
 
-		final String requestUri = "/solr/update";
+		final String requestUri = "/solr/banana/update";
 		final String requestQuery = "q=test";
-		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/solr/update?" + requestQuery;
+		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + requestUri + "?" + requestQuery;
 
 		final RequestDispatcher dispatcher = mock(RequestDispatcher.class);
 		final HttpServletRequest req = mock(HttpServletRequest.class);

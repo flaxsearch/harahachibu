@@ -40,9 +40,11 @@ proxy:
   # Status code to return when disk is full (default: 500)
   errorStatus: 500
 
-  # List of URLs which should trigger a disk space check
+  # List of URLs which should trigger a disk space check.
+  # These are regular expressions, so may use full regex syntax
   checkUrls:
     - /solr/update
+    - /solr/.*/update
 
   # The proxy destination server prefix
   destinationServer: http://localhost:8983
