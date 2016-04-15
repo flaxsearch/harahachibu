@@ -27,7 +27,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.Mockito.*;
@@ -41,7 +40,7 @@ public class DiskSpaceFilterTest {
 
 	private final DiskSpaceChecker checker = mock(DiskSpaceChecker.class);
 	private final ProxyConfiguration proxyConfig = mock(ProxyConfiguration.class);
-	private final List<String> checkUrls = Arrays.asList("/solr/update", "/solr/.*/update");
+	private final List<String> checkUrls = Arrays.asList("/solr/update", "/solr/.*/update", "POST /solr/postUpdate");
 	private final String[] localPaths = new String[]{ "/set" };
 	private final int errorCode = 500;
 
@@ -113,6 +112,7 @@ public class DiskSpaceFilterTest {
 
 		verify(req, atLeastOnce()).getRequestURI();
 		verify(response).sendError(errorCode);
+		verify(checker).isSpaceAvailable();
 	}
 
 	@Test
@@ -133,6 +133,7 @@ public class DiskSpaceFilterTest {
 
 		verify(req, atLeastOnce()).getRequestURI();
 		verify(response).sendError(errorCode);
+		verify(checker).isSpaceAvailable();
 	}
 
 	@Test
@@ -159,6 +160,60 @@ public class DiskSpaceFilterTest {
 		verify(req, atLeastOnce()).getQueryString();
 		verify(req).getRequestDispatcher(proxiedUri);
 		verify(dispatcher).forward(req, response);
+		verify(checker).isSpaceAvailable();
+	}
+
+	@Test
+	public void skipCheckWhenRequestNotPOST() throws Exception {
+		final String requestUri = "/solr/postUpdate";
+		final String requestQuery = "q=test";
+		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + requestUri + "?" + requestQuery;
+
+		final RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+		final HttpServletRequest req = mock(HttpServletRequest.class);
+		when(req.getRequestURI()).thenReturn(requestUri);
+		when(req.getContextPath()).thenReturn("");
+		when(req.getQueryString()).thenReturn(requestQuery);
+		when(req.getMethod()).thenReturn("GET");
+		when(req.getRequestDispatcher(proxiedUri)).thenReturn(dispatcher);
+
+		final ServletResponse response = mock(ServletResponse.class);
+		final FilterChain chain = mock(FilterChain.class);
+
+		filter.doFilter(req, response, chain);
+
+		verify(req, atLeastOnce()).getRequestURI();
+		verify(req, atLeastOnce()).getQueryString();
+		verify(req).getRequestDispatcher(proxiedUri);
+		verify(dispatcher).forward(req, response);
+	}
+
+	@Test
+	public void checkSpaceForPOSTRequest() throws Exception {
+		when(checker.isSpaceAvailable()).thenReturn(true);
+
+		final String requestUri = "/solr/postUpdate";
+		final String requestQuery = "q=test";
+		final String proxiedUri = DiskSpaceProxyServlet.PROXY_PATH_PREFIX + requestUri + "?" + requestQuery;
+
+		final RequestDispatcher dispatcher = mock(RequestDispatcher.class);
+		final HttpServletRequest req = mock(HttpServletRequest.class);
+		when(req.getRequestURI()).thenReturn(requestUri);
+		when(req.getContextPath()).thenReturn("");
+		when(req.getQueryString()).thenReturn(requestQuery);
+		when(req.getMethod()).thenReturn("POST");
+		when(req.getRequestDispatcher(proxiedUri)).thenReturn(dispatcher);
+
+		final ServletResponse response = mock(ServletResponse.class);
+		final FilterChain chain = mock(FilterChain.class);
+
+		filter.doFilter(req, response, chain);
+
+		verify(req, atLeastOnce()).getRequestURI();
+		verify(req, atLeastOnce()).getQueryString();
+		verify(req).getRequestDispatcher(proxiedUri);
+		verify(dispatcher).forward(req, response);
+		verify(checker).isSpaceAvailable();
 	}
 
 }

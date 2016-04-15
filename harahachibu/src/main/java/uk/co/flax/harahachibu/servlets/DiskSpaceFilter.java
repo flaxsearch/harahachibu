@@ -114,7 +114,13 @@ public class DiskSpaceFilter implements Filter {
 		final String path = request.getRequestURI();
 		if (path != null) {
 			for (String checkPath : proxyConfiguration.getCheckUrls()) {
-				if (path.matches(checkPath)) {
+				String[] checkPathParts = checkPath.split("\\s+");
+				if (checkPathParts.length == 1) {
+					if (path.matches(checkPath)) {
+						ret = true;
+						break;
+					}
+				} else if (path.matches(checkPathParts[1]) && request.getMethod().equals(checkPathParts[0])) {
 					ret = true;
 					break;
 				}

@@ -42,9 +42,14 @@ proxy:
 
   # List of URLs which should trigger a disk space check.
   # These are regular expressions, so may use full regex syntax
+  # They may also include an HTTP method, which is *not* a regex -
+  # ie. PUT and POST should be separate lines. If no method is given,
+  # all requests to that path will be checked.
   checkUrls:
     - /solr/update
     - /solr/.*/update
+    - POST /solr/.*/postUpdate
+    - PUT /solr/.*/putUpdate
 
   # The proxy destination server prefix
   destinationServer: http://localhost:8983
