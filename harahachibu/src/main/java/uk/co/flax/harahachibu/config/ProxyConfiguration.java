@@ -15,6 +15,7 @@
  */
 package uk.co.flax.harahachibu.config;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class ProxyConfiguration {
 
 	private int errorStatus = 500;
 
+	@NotNull
 	private String destinationServer;
 
 	private List<String> checkUrls = new ArrayList<>();

@@ -1,0 +1,146 @@
+{
+  "timestamp" : 1460707856902,
+  "cluster_name" : "elasticsearch",
+  "status" : "red",
+  "indices" : {
+    "count" : 21,
+    "shards" : {
+      "total" : 41,
+      "primaries" : 41,
+      "replication" : 0.0,
+      "index" : {
+        "shards" : {
+          "min" : 1,
+          "max" : 5,
+          "avg" : 1.9523809523809523
+        },
+        "primaries" : {
+          "min" : 1,
+          "max" : 5,
+          "avg" : 1.9523809523809523
+        },
+        "replication" : {
+          "min" : 0.0,
+          "max" : 0.0,
+          "avg" : 0.0
+        }
+      }
+    },
+    "docs" : {
+      "count" : 381208,
+      "deleted" : 5478
+    },
+    "store" : {
+      "size_in_bytes" : 369027656,
+      "throttle_time_in_millis" : 0
+    },
+    "fielddata" : {
+      "memory_size_in_bytes" : 0,
+      "evictions" : 0
+    },
+    "filter_cache" : {
+      "memory_size_in_bytes" : 0,
+      "evictions" : 0
+    },
+    "id_cache" : {
+      "memory_size_in_bytes" : 0
+    },
+    "completion" : {
+      "size_in_bytes" : 0
+    },
+    "segments" : {
+      "count" : 170,
+      "memory_in_bytes" : 22582892,
+      "index_writer_memory_in_bytes" : 0,
+      "index_writer_max_memory_in_bytes" : 2688548864,
+      "version_map_memory_in_bytes" : 0,
+      "fixed_bit_set_memory_in_bytes" : 0
+    },
+    "percolate" : {
+      "total" : 0,
+      "time_in_millis" : 0,
+      "current" : 0,
+      "memory_size_in_bytes" : -1,
+      "memory_size" : "-1b",
+      "queries" : 0
+    }
+  },
+  "nodes" : {
+    "count" : {
+      "total" : 1,
+      "master_only" : 0,
+      "data_only" : 0,
+      "master_data" : 1,
+      "client" : 0
+    },
+    "versions" : [ "1.7.1" ],
+    "os" : {
+      "available_processors" : 4,
+      "mem" : {
+        "total_in_bytes" : 12599836672
+      },
+      "cpu" : [ {
+        "vendor" : "AMD",
+        "model" : "Phenom(tm) II X4 955 Processor",
+        "mhz" : 3200,
+        "total_cores" : 4,
+        "total_sockets" : 1,
+        "cores_per_socket" : 4,
+        "cache_size_in_bytes" : 512,
+        "count" : 1
+      } ]
+    },
+    "process" : {
+      "cpu" : {
+        "percent" : 7
+      },
+      "open_file_descriptors" : {
+        "min" : 562,
+        "max" : 562,
+        "avg" : 562
+      }
+    },
+    "jvm" : {
+      "max_uptime_in_millis" : 147754,
+      "versions" : [ {
+        "version" : "1.8.0_77",
+        "vm_name" : "Java HotSpot(TM) 64-Bit Server VM",
+        "vm_version" : "25.77-b03",
+        "vm_vendor" : "Oracle Corporation",
+        "count" : 1
+      } ],
+      "mem" : {
+        "heap_used_in_bytes" : 200895936,
+        "heap_max_in_bytes" : 1038876672
+      },
+      "threads" : 67
+    },
+    "fs" : {
+      "total_in_bytes" : 206289465344,
+      "free_in_bytes" : 132862898176,
+      "available_in_bytes" : 122360365056,
+      "disk_reads" : 95608,
+      "disk_writes" : 25283,
+      "disk_io_op" : 120891,
+      "disk_read_size_in_bytes" : 919303168,
+      "disk_write_size_in_bytes" : 966389760,
+      "disk_io_size_in_bytes" : 1885692928,
+      "disk_queue" : "0",
+      "disk_service_time" : "15.9"
+    },
+    "plugins" : [ {
+      "name" : "marvel",
+      "version" : "1.3.1",
+      "description" : "Elasticsearch Management & Monitoring",
+      "url" : "/_plugin/marvel/",
+      "jvm" : true,
+      "site" : true
+    }, {
+      "name" : "ontology-update",
+      "version" : "NA",
+      "description" : "Ontology Update plugin",
+      "jvm" : true,
+      "site" : false
+    } ]
+  }
+}

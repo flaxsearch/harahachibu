@@ -25,7 +25,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.mockserver.client.server.MockServerClient;
-import uk.co.flax.harahachibu.config.ProxyConfiguration;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Hashtable;
@@ -42,7 +41,7 @@ import static org.mockserver.model.HttpResponse.response;
  */
 public class DiskSpaceProxyServletTest {
 
-	private static final int MIN_PORT = 8000;
+	private static final int MIN_PORT = 12000;
 	private static final int MAX_PORT = 65535;
 	private static final String HEADER_NAME = "Mock-Server";
 	private static final String HEADER_VALUE = "Proxied OK";
@@ -50,7 +49,6 @@ public class DiskSpaceProxyServletTest {
 	private final int port = MIN_PORT + (int) (Math.random() * (MAX_PORT - MIN_PORT + 1));
 
 	private MockServerClient mockServer;
-	private ProxyConfiguration proxyConfiguration = new ProxyConfiguration();
 	private final ServletRunner servletRunner = new ServletRunner();
 	private final Hashtable initParams = new Hashtable();
 

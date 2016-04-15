@@ -16,6 +16,7 @@
 package uk.co.flax.harahachibu;
 
 import io.dropwizard.Application;
+import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.servlets.DiskSpaceFilter;
@@ -23,6 +24,7 @@ import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.ServletRegistration;
+import javax.ws.rs.client.Client;
 import java.util.EnumSet;
 
 /**
@@ -43,6 +45,11 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
 		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
 		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
+
+		// Set up the Jersey client - required for HTTP client interactions
+		final Client client = new JerseyClientBuilder(environment)
+				.using(config.getJerseyClient())
+				.build(getName());
 
 		environment.jersey().register(new SetSpaceResource());
 	}

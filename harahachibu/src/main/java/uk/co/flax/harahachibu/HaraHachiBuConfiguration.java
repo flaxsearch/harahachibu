@@ -16,7 +16,11 @@
 package uk.co.flax.harahachibu;
 
 import io.dropwizard.Configuration;
+import io.dropwizard.client.JerseyClientConfiguration;
 import uk.co.flax.harahachibu.config.ProxyConfiguration;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 /**
  * Base configuration class for the Hara Hachi Bu proxy application.
@@ -25,7 +29,11 @@ import uk.co.flax.harahachibu.config.ProxyConfiguration;
  */
 public class HaraHachiBuConfiguration extends Configuration {
 
+	@Valid @NotNull
 	private ProxyConfiguration proxy;
+
+	@Valid @NotNull
+	private JerseyClientConfiguration jerseyClient = new JerseyClientConfiguration();
 
 	public ProxyConfiguration getProxy() {
 		return proxy;
@@ -34,4 +42,13 @@ public class HaraHachiBuConfiguration extends Configuration {
 	public void setProxy(ProxyConfiguration proxy) {
 		this.proxy = proxy;
 	}
+
+	public JerseyClientConfiguration getJerseyClient() {
+		return jerseyClient;
+	}
+
+	public void setJerseyClient(JerseyClientConfiguration jerseyClient) {
+		this.jerseyClient = jerseyClient;
+	}
+
 }
