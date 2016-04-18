@@ -64,7 +64,7 @@ diskSpace:
   #   - TODO : solrCluster, for built-in clustered Solr checker (requires external processes
   #     to pass free space data to application)
   #   - TODO : Another implementation of uk.co.flax.harahachibu.services.DiskSpaceChecker
-  - checkerType: elasticsearch
+  checkerType: elasticsearch
 
   # The minimum amount of space required on the disk to pass the space check.
   # May be a single number of bytes, a number of Kilobytes, Megabytes or Gigabytes,
@@ -74,11 +74,11 @@ diskSpace:
   #   - 512M
   #   - 16G
   #   - 5%
-  - threshold: 5%
+  threshold: 5%
 
-  - configuration:
+  configuration:
     # Base URL for the Elasticsearch host
-    - baseURL: http://localhost:9200
+    baseURL: http://localhost:9200
 
 
 # Logging
