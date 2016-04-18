@@ -17,6 +17,7 @@ package uk.co.flax.harahachibu;
 
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
+import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
 import uk.co.flax.harahachibu.config.ProxyConfiguration;
 
 import javax.validation.Valid;
@@ -35,6 +36,9 @@ public class HaraHachiBuConfiguration extends Configuration {
 	@Valid @NotNull
 	private JerseyClientConfiguration jerseyClient = new JerseyClientConfiguration();
 
+	@Valid @NotNull
+	private DiskSpaceConfiguration diskSpace;
+
 	public ProxyConfiguration getProxy() {
 		return proxy;
 	}
@@ -51,4 +55,11 @@ public class HaraHachiBuConfiguration extends Configuration {
 		this.jerseyClient = jerseyClient;
 	}
 
+	public DiskSpaceConfiguration getDiskSpace() {
+		return diskSpace;
+	}
+
+	public void setDiskSpace(DiskSpaceConfiguration diskSpace) {
+		this.diskSpace = diskSpace;
+	}
 }

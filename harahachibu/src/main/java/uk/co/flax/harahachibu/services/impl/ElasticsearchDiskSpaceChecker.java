@@ -22,12 +22,17 @@ import uk.co.flax.harahachibu.services.DiskSpaceCheckerException;
 import uk.co.flax.harahachibu.services.DiskSpaceThreshold;
 import uk.co.flax.harahachibu.services.data.ElasticsearchClusterStats;
 
+import javax.ws.rs.client.Client;
+import java.util.Map;
+
 /**
  * Disk space checker for Elasticsearch using /_cluster/stats lookup.
  * <p>
  * Created by mlp on 14/04/16.
  */
 public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
+
+	public static final String BASE_URL_CONFIG_OPTION = "baseURL";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchDiskSpaceChecker.class);
 
@@ -55,4 +60,18 @@ public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
 		return threshold.withinThreshold(free, max);
 	}
 
+	@Override
+	public void configure(Map<String, Object> configuration) throws DiskSpaceCheckerException {
+		// NO OP
+	}
+
+	@Override
+	public boolean requiresHttpClient() {
+		return false;
+	}
+
+	@Override
+	public void setHttpClient(Client httpClient) {
+		// NO OP
+	}
 }

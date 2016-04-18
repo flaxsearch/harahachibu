@@ -15,12 +15,15 @@
  */
 package uk.co.flax.harahachibu;
 
+import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.jetty.setup.ServletEnvironment;
+import io.dropwizard.lifecycle.setup.LifecycleEnvironment;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
+import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
 import uk.co.flax.harahachibu.config.ProxyConfiguration;
 import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
@@ -30,9 +33,7 @@ import javax.servlet.ServletRegistration;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for the Hara Hachi Bu application class.
@@ -41,6 +42,8 @@ import static org.mockito.Mockito.when;
  */
 public class HaraHachiBuApplicationTest {
 
+	private final LifecycleEnvironment lifecycleEnvironment = spy(new LifecycleEnvironment());
+	private final MetricRegistry metrics = new MetricRegistry();
 	private final Environment environment = mock(Environment.class);
 	private final ServletEnvironment servlets = mock(ServletEnvironment.class);
 	private final FilterRegistration.Dynamic filterDynamic = mock(FilterRegistration.Dynamic.class);
@@ -50,10 +53,13 @@ public class HaraHachiBuApplicationTest {
 	private final HaraHachiBuApplication application = new HaraHachiBuApplication();
 	private final HaraHachiBuConfiguration config = new HaraHachiBuConfiguration();
 	private final ProxyConfiguration proxyConfiguration = new ProxyConfiguration();
+	private final DiskSpaceConfiguration diskSpaceConfiguration = new DiskSpaceConfiguration();
 
 	@Before
 	public void setup() throws Exception {
 		when(environment.servlets()).thenReturn(servlets);
+		when(environment.lifecycle()).thenReturn(lifecycleEnvironment);
+		when(environment.metrics()).thenReturn(metrics);
 		when(servlets.addFilter(isA(String.class), isA(Filter.class))).thenReturn(filterDynamic);
 		when(servlets.addServlet(eq("diskSpaceProxyServlet"), isA(DiskSpaceProxyServlet.class))).thenReturn(servletDynamic);
 		when(environment.jersey()).thenReturn(jersey);
@@ -61,6 +67,9 @@ public class HaraHachiBuApplicationTest {
 
 		// Config
 		config.setProxy(proxyConfiguration);
+		config.setDiskSpace(diskSpaceConfiguration);
+		diskSpaceConfiguration.setThreshold("5M");
+		diskSpaceConfiguration.setCheckerType("dummy");
 	}
 
 

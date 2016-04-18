@@ -55,6 +55,32 @@ proxy:
   destinationServer: http://localhost:8983
 
 
+diskSpace:
+
+  # Checker type represents the type of checker to instantiate.
+  # One of
+  #   - elasticsearch, for built-in ES checker
+  #   - TODO : solr, for built-in local Solr checker
+  #   - TODO : solrCluster, for built-in clustered Solr checker (requires external processes
+  #     to pass free space data to application)
+  #   - TODO : Another implementation of uk.co.flax.harahachibu.services.DiskSpaceChecker
+  - checkerType: elasticsearch
+
+  # The minimum amount of space required on the disk to pass the space check.
+  # May be a single number of bytes, a number of Kilobytes, Megabytes or Gigabytes,
+  # or a percentage, respectively represented as:
+  #   - 123456
+  #   - 128K
+  #   - 512M
+  #   - 16G
+  #   - 5%
+  - threshold: 5%
+
+  - configuration:
+    # Base URL for the Elasticsearch host
+    - baseURL: http://localhost:9200
+
+
 # Logging
 logging:
 

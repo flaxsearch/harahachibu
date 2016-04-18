@@ -19,6 +19,8 @@ import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
+import uk.co.flax.harahachibu.services.DiskSpaceChecker;
+import uk.co.flax.harahachibu.services.DiskSpaceCheckerBuilder;
 import uk.co.flax.harahachibu.servlets.DiskSpaceFilter;
 import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
@@ -36,20 +38,22 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 
 	@Override
 	public void run(HaraHachiBuConfiguration config, Environment environment) throws Exception {
+		// Set up the Jersey client - required for HTTP client interactions
+		final Client client = new JerseyClientBuilder(environment)
+				.using(config.getJerseyClient())
+				.build(getName());
+		// Build the disk space checker instance
+		final DiskSpaceChecker checker = new DiskSpaceCheckerBuilder(client, config.getDiskSpace()).build();
+
 		// Set up the disk space filter
 		environment.servlets()
-				.addFilter("diskSpaceFilter", new DiskSpaceFilter(null, config.getProxy(), "/set"))
+				.addFilter("diskSpaceFilter", new DiskSpaceFilter(checker, config.getProxy(), "/set"))
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
 		// Set up the proxy servlet - requires some additional configuration
 		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
 		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
 		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
-
-		// Set up the Jersey client - required for HTTP client interactions
-		final Client client = new JerseyClientBuilder(environment)
-				.using(config.getJerseyClient())
-				.build(getName());
 
 		environment.jersey().register(new SetSpaceResource());
 	}
