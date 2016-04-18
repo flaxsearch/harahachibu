@@ -15,6 +15,8 @@
  */
 package uk.co.flax.harahachibu.services.impl;
 
+import com.google.common.annotations.VisibleForTesting;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.services.DiskSpaceChecker;
@@ -22,7 +24,11 @@ import uk.co.flax.harahachibu.services.DiskSpaceCheckerException;
 import uk.co.flax.harahachibu.services.DiskSpaceThreshold;
 
 import javax.ws.rs.client.Client;
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileStore;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -33,17 +39,43 @@ public class SolrDiskSpaceChecker implements DiskSpaceChecker {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SolrDiskSpaceChecker.class);
 
+	static final String DATA_DIR_CONFIG_OPTION = "dataDirectory";
+
 	private DiskSpaceThreshold threshold;
-	private File dataDirectory;
+	private FileStore fs;
 
 	@Override
 	public boolean isSpaceAvailable() throws DiskSpaceCheckerException {
-		return false;
+		boolean available;
+
+		try {
+			long freeSpace = fs.getUsableSpace();
+			long totalSpace = fs.getTotalSpace();
+
+			available = threshold.withinThreshold(freeSpace, totalSpace);
+		} catch (IOException e) {
+			LOGGER.error("IO Exception caught checking file store: {}", e.getMessage());
+			throw new DiskSpaceCheckerException(e);
+		}
+
+		return available;
 	}
 
 	@Override
 	public void configure(Map<String, Object> configuration) throws DiskSpaceCheckerException {
-
+		final String dataPath = (String) configuration.get(DATA_DIR_CONFIG_OPTION);
+		if (StringUtils.isBlank(dataPath)) {
+			throw new DiskSpaceCheckerException("No data directory given for Solr disk space checker");
+		} else {
+			try {
+				// Set up the FileStore
+				Path path = FileSystems.getDefault().getPath(dataPath);
+				fs = Files.getFileStore(path);
+			} catch (IOException e) {
+				LOGGER.error("IO Exception initialising file store: {}", e.getMessage());
+				throw new DiskSpaceCheckerException(e);
+			}
+		}
 	}
 
 	@Override
@@ -58,6 +90,12 @@ public class SolrDiskSpaceChecker implements DiskSpaceChecker {
 
 	@Override
 	public void setThreshold(DiskSpaceThreshold threshold) {
-
+		this.threshold = threshold;
 	}
+
+	@VisibleForTesting
+	void setFileStore(FileStore fs) {
+		this.fs = fs;
+	}
+
 }

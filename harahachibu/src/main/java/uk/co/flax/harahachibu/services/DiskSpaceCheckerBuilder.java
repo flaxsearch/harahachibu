@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchClient;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchDiskSpaceChecker;
+import uk.co.flax.harahachibu.services.impl.SolrDiskSpaceChecker;
 
 import javax.ws.rs.client.Client;
 
@@ -55,12 +56,16 @@ public class DiskSpaceCheckerBuilder {
 			case DiskSpaceConfiguration.ELASTICSEARCH_CHECKER:
 				checker = buildElasticsearchChecker();
 				break;
+			case DiskSpaceConfiguration.SOLR_LOCAL_CHECKER:
+				checker = new SolrDiskSpaceChecker();
+				break;
 			default:
 				LOGGER.warn("Cannot instantiate DiskSpaceChecker of type {}", configuration.getCheckerType());
 				checker = null;
 		}
 
 		if (checker != null) {
+			checker.configure(configuration.getConfiguration());
 			checker.setThreshold(DiskSpaceThreshold.parse(configuration.getThreshold()));
 		}
 
