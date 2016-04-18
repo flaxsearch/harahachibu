@@ -50,26 +50,29 @@ public class DiskSpaceCheckerBuilder {
 	 */
 	public DiskSpaceChecker build() throws ClassNotFoundException, DiskSpaceCheckerException {
 		final DiskSpaceChecker checker;
-		final DiskSpaceThreshold threshold = DiskSpaceThreshold.parse(configuration.getThreshold());
 
 		switch (configuration.getCheckerType()) {
 			case DiskSpaceConfiguration.ELASTICSEARCH_CHECKER:
-				checker = buildElasticsearchChecker(threshold);
+				checker = buildElasticsearchChecker();
 				break;
 			default:
 				LOGGER.warn("Cannot instantiate DiskSpaceChecker of type {}", configuration.getCheckerType());
 				checker = null;
 		}
 
+		if (checker != null) {
+			checker.setThreshold(DiskSpaceThreshold.parse(configuration.getThreshold()));
+		}
+
 		return checker;
 	}
 
 
-	private DiskSpaceChecker buildElasticsearchChecker(DiskSpaceThreshold threshold) {
+	private DiskSpaceChecker buildElasticsearchChecker() {
 		final ElasticsearchClient elasticsearch = new ElasticsearchClient(
 				client,
 				(String) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.BASE_URL_CONFIG_OPTION));
-		return new ElasticsearchDiskSpaceChecker(elasticsearch, threshold);
+		return new ElasticsearchDiskSpaceChecker(elasticsearch);
 	}
 
 }

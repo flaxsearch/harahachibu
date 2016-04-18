@@ -20,48 +20,30 @@ import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.services.DiskSpaceChecker;
 import uk.co.flax.harahachibu.services.DiskSpaceCheckerException;
 import uk.co.flax.harahachibu.services.DiskSpaceThreshold;
-import uk.co.flax.harahachibu.services.data.ElasticsearchClusterStats;
 
 import javax.ws.rs.client.Client;
+import java.io.File;
 import java.util.Map;
 
 /**
- * Disk space checker for Elasticsearch using /_cluster/stats lookup.
- * <p>
- * Created by mlp on 14/04/16.
+ * Solr disk space checker for local (ie. non-clustered) Solr instances.
+ * Created by mlp on 18/04/16.
  */
-public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
+public class SolrDiskSpaceChecker implements DiskSpaceChecker {
 
-	public static final String BASE_URL_CONFIG_OPTION = "baseURL";
+	private static final Logger LOGGER = LoggerFactory.getLogger(SolrDiskSpaceChecker.class);
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchDiskSpaceChecker.class);
-
-	private final ElasticsearchClient elasticsearch;
 	private DiskSpaceThreshold threshold;
-
-	public ElasticsearchDiskSpaceChecker(ElasticsearchClient client) {
-		this.elasticsearch = client;
-	}
+	private File dataDirectory;
 
 	@Override
 	public boolean isSpaceAvailable() throws DiskSpaceCheckerException {
-		final ElasticsearchClusterStats stats = elasticsearch.getClusterStats();
-
-		long free = stats.getFilesystemAvailableBytes();
-		long max = stats.getFilesystemTotalBytes();
-
-		if (max == 0) {
-			LOGGER.warn("ES Cluster Stats reports 0 total bytes - possible issue with ES cluster");
-		} else if (free == 0) {
-			LOGGER.warn("ES Cluster Stats reports 0 free bytes");
-		}
-
-		return threshold.withinThreshold(free, max);
+		return false;
 	}
 
 	@Override
 	public void configure(Map<String, Object> configuration) throws DiskSpaceCheckerException {
-		// NO OP
+
 	}
 
 	@Override
@@ -71,11 +53,11 @@ public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
 
 	@Override
 	public void setHttpClient(Client httpClient) {
-		// NO OP
+		// NO_OP
 	}
 
 	@Override
 	public void setThreshold(DiskSpaceThreshold threshold) {
-		this.threshold = threshold;
+
 	}
 }

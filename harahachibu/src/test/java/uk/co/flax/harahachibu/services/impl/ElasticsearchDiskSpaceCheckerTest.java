@@ -38,7 +38,7 @@ public class ElasticsearchDiskSpaceCheckerTest {
 	@Test(expected = uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
 	public void throwsExceptionWhenESFails() throws Exception {
 		when(elasticsearch.getClusterStats()).thenThrow(new DiskSpaceCheckerException("error"));
-		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch, null);
+		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch);
 
 		checker.isSpaceAvailable();
 
@@ -57,7 +57,8 @@ public class ElasticsearchDiskSpaceCheckerTest {
 
 		when(threshold.withinThreshold(freeSpace, maxSpace)).thenReturn(false);
 
-		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch, threshold);
+		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch);
+		checker.setThreshold(threshold);
 
 		assertThat(checker.isSpaceAvailable()).isFalse();
 		verify(elasticsearch).getClusterStats();
@@ -76,7 +77,8 @@ public class ElasticsearchDiskSpaceCheckerTest {
 
 		when(threshold.withinThreshold(freeSpace, maxSpace)).thenReturn(true);
 
-		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch, threshold);
+		ElasticsearchDiskSpaceChecker checker = new ElasticsearchDiskSpaceChecker(elasticsearch);
+		checker.setThreshold(threshold);
 
 		assertThat(checker.isSpaceAvailable()).isTrue();
 		verify(elasticsearch).getClusterStats();

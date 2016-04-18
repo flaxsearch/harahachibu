@@ -56,4 +56,10 @@ public interface DiskSpaceChecker {
 	 */
 	void setHttpClient(Client httpClient);
 
+	/**
+	 * Set the disk space threshold to use to check for available space.
+	 * @param threshold the threshold.
+	 */
+	void setThreshold(DiskSpaceThreshold threshold);
+
 }
