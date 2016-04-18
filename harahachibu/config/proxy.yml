@@ -60,7 +60,7 @@ diskSpace:
   # Checker type represents the type of checker to instantiate.
   # One of
   #   - elasticsearch, for built-in ES checker
-  #   - TODO : solr, for built-in local Solr checker
+  #   - solr, for built-in local Solr checker
   #   - TODO : solrCluster, for built-in clustered Solr checker (requires external processes
   #     to pass free space data to application)
   #   - TODO : Another implementation of uk.co.flax.harahachibu.services.DiskSpaceChecker
@@ -77,8 +77,11 @@ diskSpace:
   threshold: 5%
 
   configuration:
-    # Base URL for the Elasticsearch host
+    # Base URL for the Elasticsearch host (when checkerType == elasticsearch)
     baseURL: http://localhost:9200
+
+    # Data directory for the local Solr instance (when checkerType == solr)
+    dataDirectory: /data/solr
 
 
 # Logging
