@@ -15,20 +15,43 @@
  */
 package uk.co.flax.harahachibu.resources;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import uk.co.flax.harahachibu.api.SetSpaceResponse;
+import uk.co.flax.harahachibu.services.ClusterDiskSpaceManager;
+import uk.co.flax.harahachibu.services.DiskSpaceCheckerException;
+import uk.co.flax.harahachibu.services.data.DiskSpace;
+
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
 /**
  * Endpoint to allow disk space to be set for remote servers.
  *
  * Created by mlp on 14/04/16.
  */
-@Path("/set")
+@Path("/setSpace/{host}/{freeSpace}/{maxSpace}")
 public class SetSpaceResource {
 
-	@GET
-	public String handleGet() {
-		return "OK";
+	private final ClusterDiskSpaceManager clusterManager;
+
+	public SetSpaceResource(ClusterDiskSpaceManager clusterManager) {
+		this.clusterManager = clusterManager;
+	}
+
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
+	public SetSpaceResponse handlePost(@PathParam("host") String server,
+									   @PathParam("freeSpace") long freeSpace,
+									   @PathParam("maxSpace") long maxSpace) {
+		SetSpaceResponse response;
+
+		try {
+			clusterManager.setDiskSpace(server, new DiskSpace(freeSpace, maxSpace));
+			response = SetSpaceResponse.okResponse();
+		} catch (DiskSpaceCheckerException e) {
+			response = new SetSpaceResponse(SetSpaceResponse.ResponseCode.ERROR, e.getMessage());
+		}
+
+		return response;
 	}
 
 }
