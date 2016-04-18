@@ -15,7 +15,11 @@
  */
 package uk.co.flax.harahachibu.services;
 
+import uk.co.flax.harahachibu.services.data.DiskSpace;
+
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Manager class for tracking disk space across a cluster.
@@ -24,6 +28,38 @@ import java.util.Set;
  */
 public class ClusterDiskSpaceManager {
 
-//	private final Set<String> servers;
+	private final Set<String> servers;
+	private final Map<String, DiskSpace> diskSpaceMap = new ConcurrentHashMap<>();
+
+	/**
+	 * Construct the ClusterDiskSpaceManager.
+	 * @param servers the set of valid servers for the cluster.
+	 */
+	public ClusterDiskSpaceManager(Set<String> servers) {
+		this.servers = servers;
+	}
+
+	/**
+	 * Set the disk space for a server.
+	 * @param server the server.
+	 * @param space the DiskSpace object holding the disk space details.
+	 * @throws DiskSpaceCheckerException if the server is not in the server list
+	 * used to construct the manager.
+	 */
+	public void setDiskSpace(String server, DiskSpace space) throws DiskSpaceCheckerException {
+		if (!servers.contains(server)) {
+			throw new DiskSpaceCheckerException("Unrecognised server " + server);
+		}
+
+		diskSpaceMap.put(server, space);
+	}
+
+	/**
+	 * Get the current map of server - disk space statuses.
+	 * @return the map.
+	 */
+	public Map<String, DiskSpace> getDiskSpace() {
+		return diskSpaceMap;
+	}
 
 }
