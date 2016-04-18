@@ -13,3 +13,7 @@ hs_err_pid*
 
 # Maven fat jar builder output
 dependency-reduced-pom.xml
+
+# Local config files
+*_local.yml
+
