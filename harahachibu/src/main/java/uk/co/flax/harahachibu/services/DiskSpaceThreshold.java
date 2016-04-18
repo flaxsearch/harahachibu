@@ -18,6 +18,7 @@ package uk.co.flax.harahachibu.services;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.co.flax.harahachibu.services.data.DiskSpace;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,6 +103,16 @@ public class DiskSpaceThreshold {
 
 	public boolean isPercentage() {
 		return percentage;
+	}
+
+	/**
+	 * Check whether or not a {@link DiskSpace} object representing
+	 * space on a server is within this threshold.
+	 * @param diskSpace the disk space data.
+	 * @return {code true} if the space available is within the threshold value.
+	 */
+	public boolean withinThreshold(DiskSpace diskSpace) {
+		return withinThreshold(diskSpace.getFreeSpace(), diskSpace.getMaxSpace());
 	}
 
 	/**

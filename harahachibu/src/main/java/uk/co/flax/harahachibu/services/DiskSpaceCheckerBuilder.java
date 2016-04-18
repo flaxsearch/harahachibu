@@ -15,14 +15,19 @@
  */
 package uk.co.flax.harahachibu.services;
 
+import io.dropwizard.setup.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
+import uk.co.flax.harahachibu.resources.SetSpaceResource;
+import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchClient;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchDiskSpaceChecker;
 import uk.co.flax.harahachibu.services.impl.SolrDiskSpaceChecker;
 
 import javax.ws.rs.client.Client;
+import java.util.LinkedHashSet;
+import java.util.List;
 
 /**
  * Builder class for DiskSpaceChecker implementations.
@@ -33,10 +38,12 @@ public class DiskSpaceCheckerBuilder {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(DiskSpaceCheckerBuilder.class);
 
+	private final Environment environment;
 	private final Client client;
 	private final DiskSpaceConfiguration configuration;
 
-	public DiskSpaceCheckerBuilder(Client client, DiskSpaceConfiguration configuration) {
+	public DiskSpaceCheckerBuilder(Environment environment, Client client, DiskSpaceConfiguration configuration) {
+		this.environment = environment;
 		this.client = client;
 		this.configuration = configuration;
 	}
@@ -44,6 +51,7 @@ public class DiskSpaceCheckerBuilder {
 
 	/**
 	 * Build the disk space checker specified in the configuration.
+	 *
 	 * @return a {@link DiskSpaceChecker} implementation.
 	 * @throws ClassNotFoundException if the {@link DiskSpaceChecker} implementation class
 	 * cannot be found.
@@ -58,6 +66,10 @@ public class DiskSpaceCheckerBuilder {
 				break;
 			case DiskSpaceConfiguration.SOLR_LOCAL_CHECKER:
 				checker = new SolrDiskSpaceChecker();
+				break;
+			case DiskSpaceConfiguration.SOLR_CLUSTER_CHECKER:
+				checker = buildClusterChecker(
+						(List<String>) configuration.getConfiguration().get(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION));
 				break;
 			default:
 				LOGGER.warn("Cannot instantiate DiskSpaceChecker of type {}", configuration.getCheckerType());
@@ -78,6 +90,16 @@ public class DiskSpaceCheckerBuilder {
 				client,
 				(String) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.BASE_URL_CONFIG_OPTION));
 		return new ElasticsearchDiskSpaceChecker(elasticsearch);
+	}
+
+	private DiskSpaceChecker buildClusterChecker(List<String> servers) {
+		final ClusterDiskSpaceManager clusterManager = new ClusterDiskSpaceManager(new LinkedHashSet<>(servers));
+
+		// Register the /setSpace endpoint
+		environment.jersey().register(new SetSpaceResource(clusterManager));
+
+		// And build the cluster disk space checker
+		return new ClusterDiskSpaceChecker(clusterManager);
 	}
 
 }

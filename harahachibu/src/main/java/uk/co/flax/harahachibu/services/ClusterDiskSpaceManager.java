@@ -62,4 +62,12 @@ public class ClusterDiskSpaceManager {
 		return diskSpaceMap;
 	}
 
+	/**
+	 * Get the list of servers for which we should have disk space settings.
+	 * @return the servers.
+	 */
+	public Set<String> getServers() {
+		return servers;
+	}
+
 }

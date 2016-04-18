@@ -19,8 +19,10 @@ import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
+import uk.co.flax.harahachibu.services.ClusterDiskSpaceManager;
 import uk.co.flax.harahachibu.services.DiskSpaceChecker;
 import uk.co.flax.harahachibu.services.DiskSpaceCheckerBuilder;
+import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
 import uk.co.flax.harahachibu.servlets.DiskSpaceFilter;
 import uk.co.flax.harahachibu.servlets.DiskSpaceProxyServlet;
 
@@ -28,6 +30,8 @@ import javax.servlet.DispatcherType;
 import javax.servlet.ServletRegistration;
 import javax.ws.rs.client.Client;
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * Main application class for Hara Hachi Bu proxy application.
@@ -42,8 +46,9 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 		final Client client = new JerseyClientBuilder(environment)
 				.using(config.getJerseyClient())
 				.build(getName());
-		// Build the disk space checker instance
-		final DiskSpaceChecker checker = new DiskSpaceCheckerBuilder(client, config.getDiskSpace()).build();
+		// Build the disk space checker instance -
+		// this may add new resources and healthchecks to the environment.
+		final DiskSpaceChecker checker = new DiskSpaceCheckerBuilder(environment, client, config.getDiskSpace()).build();
 
 		// Set up the disk space filter
 		environment.servlets()
@@ -54,8 +59,6 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
 		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
 		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
-
-		environment.jersey().register(new SetSpaceResource());
 	}
 
 	public static void main(String[] args) throws Exception {

@@ -39,7 +39,7 @@ public class SolrDiskSpaceChecker implements DiskSpaceChecker {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SolrDiskSpaceChecker.class);
 
-	static final String DATA_DIR_CONFIG_OPTION = "dataDirectory";
+	public static final String DATA_DIR_CONFIG_OPTION = "dataDirectory";
 
 	private DiskSpaceThreshold threshold;
 	private FileStore fs;

@@ -83,6 +83,11 @@ diskSpace:
     # Data directory for the local Solr instance (when checkerType == solr)
     dataDirectory: /data/solr
 
+    # Cluster servers - this is a white list of servers in the cluster which
+    # may pass disk space settings through. Any other servers will cause an error.
+    clusterServers:
+      - localhost
+
 
 # Logging
 logging:
