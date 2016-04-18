@@ -61,7 +61,7 @@ diskSpace:
   # One of
   #   - elasticsearch, for built-in ES checker
   #   - solr, for built-in local Solr checker
-  #   - TODO : solrCluster, for built-in clustered Solr checker (requires external processes
+  #   - cluster, for built-in clustered Solr checker (requires external processes
   #     to pass free space data to application)
   #   - TODO : Another implementation of uk.co.flax.harahachibu.services.DiskSpaceChecker
   checkerType: elasticsearch
@@ -84,7 +84,8 @@ diskSpace:
     dataDirectory: /data/solr
 
     # Cluster servers - this is a white list of servers in the cluster which
-    # may pass disk space settings through. Any other servers will cause an error.
+    # may pass disk space settings through. Any other servers will cause an error
+    # (when checkerType == cluster)
     clusterServers:
       - localhost
 

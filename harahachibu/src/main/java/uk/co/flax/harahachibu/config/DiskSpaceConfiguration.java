@@ -28,7 +28,7 @@ public class DiskSpaceConfiguration {
 
 	public static final String ELASTICSEARCH_CHECKER = "elasticsearch";
 	public static final String SOLR_LOCAL_CHECKER = "solr";
-	public static final String SOLR_CLUSTER_CHECKER = "solrCluster";
+	public static final String CLUSTER_CHECKER = "cluster";
 
 	@NotNull
 	private String checkerType;
@@ -36,6 +36,7 @@ public class DiskSpaceConfiguration {
 	@NotNull
 	private String threshold;
 
+	@NotNull
 	private Map<String, Object> configuration = new HashMap<>();
 
 

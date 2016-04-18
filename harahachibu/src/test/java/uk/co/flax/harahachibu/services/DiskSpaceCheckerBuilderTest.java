@@ -19,8 +19,6 @@ import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
@@ -79,7 +77,7 @@ public class DiskSpaceCheckerBuilderTest {
 
 	@Test
 	public void buildClusterChecker() throws Exception {
-		configuration.setCheckerType(DiskSpaceConfiguration.SOLR_CLUSTER_CHECKER);
+		configuration.setCheckerType(DiskSpaceConfiguration.CLUSTER_CHECKER);
 		configuration.getConfiguration().put(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION, Arrays.asList("localhost", "192.168.0.100"));
 
 		DiskSpaceChecker checker = builder.build();

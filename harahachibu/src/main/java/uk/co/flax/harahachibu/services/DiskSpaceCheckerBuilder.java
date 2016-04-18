@@ -67,7 +67,7 @@ public class DiskSpaceCheckerBuilder {
 			case DiskSpaceConfiguration.SOLR_LOCAL_CHECKER:
 				checker = new SolrDiskSpaceChecker();
 				break;
-			case DiskSpaceConfiguration.SOLR_CLUSTER_CHECKER:
+			case DiskSpaceConfiguration.CLUSTER_CHECKER:
 				checker = buildClusterChecker(
 						(List<String>) configuration.getConfiguration().get(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION));
 				break;
