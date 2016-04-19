@@ -52,7 +52,7 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 
 		// Set up the disk space filter
 		environment.servlets()
-				.addFilter("diskSpaceFilter", new DiskSpaceFilter(checker, config.getProxy(), "/set"))
+				.addFilter("diskSpaceFilter", new DiskSpaceFilter(checker, config.getProxy(), "/setSpace"))
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
 		// Set up the proxy servlet - requires some additional configuration
