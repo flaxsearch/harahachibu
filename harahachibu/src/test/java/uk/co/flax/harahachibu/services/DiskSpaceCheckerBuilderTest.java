@@ -15,11 +15,13 @@
  */
 package uk.co.flax.harahachibu.services;
 
+import com.codahale.metrics.health.HealthCheckRegistry;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
+import uk.co.flax.harahachibu.health.ElasticsearchClientHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchDiskSpaceChecker;
@@ -43,6 +45,7 @@ import static org.mockito.Mockito.when;
 public class DiskSpaceCheckerBuilderTest {
 
 	private final JerseyEnvironment jersey = mock(JerseyEnvironment.class);
+	private final HealthCheckRegistry healthChecks = mock(HealthCheckRegistry.class);
 	private final Environment environment = mock(Environment.class);
 	private final Client httpClient = mock(Client.class);
 	private final DiskSpaceConfiguration configuration = new DiskSpaceConfiguration();
@@ -51,6 +54,7 @@ public class DiskSpaceCheckerBuilderTest {
 	@Before
 	public void setup() {
 		when(environment.jersey()).thenReturn(jersey);
+		when(environment.healthChecks()).thenReturn(healthChecks);
 		configuration.setThreshold("5M");
 	}
 
@@ -62,6 +66,8 @@ public class DiskSpaceCheckerBuilderTest {
 
 		assertThat(checker).isNotNull();
 		assertThat(checker).isInstanceOf(ElasticsearchDiskSpaceChecker.class);
+
+		verify(healthChecks).register(isA(String.class), isA(ElasticsearchClientHealthCheck.class));
 	}
 
 	@Test

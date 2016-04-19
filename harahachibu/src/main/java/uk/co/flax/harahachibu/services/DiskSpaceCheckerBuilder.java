@@ -19,6 +19,7 @@ import io.dropwizard.setup.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
+import uk.co.flax.harahachibu.health.ElasticsearchClientHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
 import uk.co.flax.harahachibu.services.impl.ElasticsearchClient;
@@ -57,12 +58,13 @@ public class DiskSpaceCheckerBuilder {
 	 * cannot be found.
 	 * @throws DiskSpaceCheckerException if other exceptions occur.
 	 */
+	@SuppressWarnings("unchecked")
 	public DiskSpaceChecker build() throws ClassNotFoundException, DiskSpaceCheckerException {
 		final DiskSpaceChecker checker;
 
 		switch (configuration.getCheckerType()) {
 			case DiskSpaceConfiguration.ELASTICSEARCH_CHECKER:
-				checker = buildElasticsearchChecker();
+				checker = buildElasticsearchChecker(environment);
 				break;
 			case DiskSpaceConfiguration.SOLR_LOCAL_CHECKER:
 				checker = new SolrDiskSpaceChecker();
@@ -87,10 +89,11 @@ public class DiskSpaceCheckerBuilder {
 	}
 
 
-	private DiskSpaceChecker buildElasticsearchChecker() {
+	private DiskSpaceChecker buildElasticsearchChecker(Environment environment) {
 		final ElasticsearchClient elasticsearch = new ElasticsearchClient(
 				client,
 				(String) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.BASE_URL_CONFIG_OPTION));
+		environment.healthChecks().register("Elasticsearch client", new ElasticsearchClientHealthCheck(elasticsearch));
 		return new ElasticsearchDiskSpaceChecker(elasticsearch);
 	}
 
