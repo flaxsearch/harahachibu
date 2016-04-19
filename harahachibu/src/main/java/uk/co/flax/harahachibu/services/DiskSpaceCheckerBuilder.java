@@ -72,13 +72,15 @@ public class DiskSpaceCheckerBuilder {
 						(List<String>) configuration.getConfiguration().get(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION));
 				break;
 			default:
-				LOGGER.warn("Cannot instantiate DiskSpaceChecker of type {}", configuration.getCheckerType());
-				checker = null;
+				checker = buildCustomChecker(configuration.getCheckerType());
 		}
 
 		if (checker != null) {
 			checker.configure(configuration.getConfiguration());
 			checker.setThreshold(DiskSpaceThreshold.parse(configuration.getThreshold()));
+			if (checker.requiresHttpClient()) {
+				checker.setHttpClient(client);
+			}
 		}
 
 		return checker;
@@ -100,6 +102,22 @@ public class DiskSpaceCheckerBuilder {
 
 		// And build the cluster disk space checker
 		return new ClusterDiskSpaceChecker(clusterManager);
+	}
+
+	private DiskSpaceChecker buildCustomChecker(String clazz) throws ClassNotFoundException, DiskSpaceCheckerException {
+		final DiskSpaceChecker checker;
+
+		try {
+			checker = (DiskSpaceChecker) Class.forName(clazz).newInstance();
+		} catch (InstantiationException e) {
+			LOGGER.error("Problem instantiating custom checker: {}", e.getMessage());
+			throw new DiskSpaceCheckerException(e);
+		} catch (IllegalAccessException e) {
+			LOGGER.error("Illegal access instantiating custom checker: {}", e.getMessage());
+			throw new DiskSpaceCheckerException(e);
+		}
+
+		return checker;
 	}
 
 }

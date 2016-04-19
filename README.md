@@ -110,3 +110,23 @@ The endpoint it calls on the application is /setSpace. This will return a JSON-s
 
 The `status` property may be either "OK" or "ERROR". In the case it returns "ERROR", the message will be populated
 with more details.
+
+
+## Using a custom disk space checker
+
+You can also implement your own disk space checker. This will need to
+implement the `uk.co.flax.harahachibu.services.DiskSpaceChecker`
+interface, and should have a no-argument constructor. To specify your
+own disk space checker, set the `diskSpace/checkerType` property in
+the configuration to your own class name:
+
+    diskSpace:
+      checkerType: my.spacechecker.CustomDiskSpaceChecker
+      
+If your checker will require an HTTP client, the `requiresHttpClient()` method
+should return `true` - the client will be set using the `setHttpClient()`
+method at initialisation time (the client is created and managed by 
+DropWizard, giving you one less thing to worry about).
+Configuration will be passed in using the
+`configure()` method, and the DiskSpaceThreshold parsed from the configuration
+file will be passed using `setThreshold()`.

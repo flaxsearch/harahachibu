@@ -88,4 +88,25 @@ public class DiskSpaceCheckerBuilderTest {
 		verify(jersey).register(isA(SetSpaceResource.class));
 	}
 
+	@Test(expected=java.lang.ClassNotFoundException.class)
+	public void throwsClassNotFoundException() throws Exception {
+		configuration.setCheckerType("uk.co.flax.NoSuchDiskSpaceChecker");
+		builder.build();
+	}
+
+	@Test(expected=uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
+	public void throwsExceptionWhenNoArgConstructorNotAvailable() throws Exception {
+		configuration.setCheckerType("uk.co.flax.harahachibu.services.TestArgsDiskSpaceChecker");
+		builder.build();
+	}
+
+	@Test
+	public void buildsCustomChecker() throws Exception {
+		configuration.setCheckerType("uk.co.flax.harahachibu.services.TestDiskSpaceChecker");
+		DiskSpaceChecker checker = builder.build();
+
+		assertThat(checker).isNotNull();
+		assertThat(checker).isInstanceOf(TestDiskSpaceChecker.class);
+	}
+
 }
