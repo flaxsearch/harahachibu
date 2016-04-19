@@ -133,11 +133,14 @@ public class DiskSpaceThreshold {
 			} else {
 				int freePercent = Math.round(((float) freeSpace / maxSpace) * 100);
 				if (freePercent <= thresholdValue) {
+					LOGGER.debug("Threshold percentage check fails: freeSpace={}, maxSpace={}, percent free={}, threshold={}%",
+							freeSpace, maxSpace, freePercent, thresholdValue);
 					ret = false;
 				}
 			}
 		} else {
 			if (freeSpace <= thresholdValue) {
+				LOGGER.debug("Threshold check fails: freeSpace={}, threshold={}", freeSpace, thresholdValue);
 				ret = false;
 			}
 		}

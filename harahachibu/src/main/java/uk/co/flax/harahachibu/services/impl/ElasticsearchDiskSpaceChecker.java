@@ -56,7 +56,10 @@ public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
 			LOGGER.warn("ES Cluster Stats reports 0 free bytes");
 		}
 
-		return threshold.withinThreshold(free, max);
+		boolean ret = threshold.withinThreshold(free, max);
+		LOGGER.debug("ES threshold check returned {}", ret);
+
+		return ret;
 	}
 
 	@Override

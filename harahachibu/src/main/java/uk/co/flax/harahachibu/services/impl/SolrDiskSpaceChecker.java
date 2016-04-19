@@ -58,6 +58,8 @@ public class SolrDiskSpaceChecker implements DiskSpaceChecker {
 			throw new DiskSpaceCheckerException(e);
 		}
 
+		LOGGER.debug("Solr threshold check returned {}", available);
+
 		return available;
 	}
 

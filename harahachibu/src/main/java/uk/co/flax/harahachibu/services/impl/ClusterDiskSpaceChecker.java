@@ -47,21 +47,23 @@ public class ClusterDiskSpaceChecker implements DiskSpaceChecker {
 	@Override
 	public boolean isSpaceAvailable() throws DiskSpaceCheckerException {
 		Map<String, DiskSpace> clusterSpace = clusterManager.getDiskSpace();
-		boolean outsideThreshold = false;
+		boolean withinThreshold = true;
 
 		for (String server : clusterManager.getServers()) {
 			DiskSpace ds = clusterSpace.get(server);
 			if (ds == null) {
 				LOGGER.warn("No DiskSpace details for {} - returning false", server);
-				outsideThreshold = true;
+				withinThreshold = false;
 				break;
 			} else if (!threshold.withinThreshold(ds)) {
 				LOGGER.debug("Server {} does not have enough space", server);
-				outsideThreshold = true;
+				withinThreshold = false;
 			}
 		}
 
-		return !outsideThreshold;
+		LOGGER.debug("Cluster threshold check returning {}", withinThreshold);
+
+		return withinThreshold;
 	}
 
 	@Override
