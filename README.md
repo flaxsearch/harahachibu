@@ -79,7 +79,7 @@ For example:
 
     http://localhost:8080/setSpace/192.168.0.1/122665120000/206289466000
     
-The free and total space values should be given in bytes.
+The request should be a POST, and the free and total space values should be given in bytes.
 
 The servers expected to be sending their space settings should be set in the `configuration` map using the
 `clusterServers` setting, like so:
@@ -94,3 +94,19 @@ or
 
 If the disk checker does not have space details for **all** of the servers in the list, it will automatically return
 a fail status.
+
+
+#### Setting free space for a cluster
+
+There is an example Python script in `scripts/clusterSetSpace.py`, which can be used as a base. The script should
+be added to your cron list (or Windows equivalent), and set to send frequently (I would suggest every minute).
+
+The endpoint it calls on the application is /setSpace. This will return a JSON-structured body like so:
+
+```
+% curl -XPOST http://localhost:8080/setSpace/localhost/122692435968/206289465344
+{"status":"OK","message":null}
+```
+
+The `status` property may be either "OK" or "ERROR". In the case it returns "ERROR", the message will be populated
+with more details.
