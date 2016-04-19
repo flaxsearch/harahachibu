@@ -21,6 +21,7 @@ import io.dropwizard.setup.Environment;
 import org.junit.Before;
 import org.junit.Test;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
+import uk.co.flax.harahachibu.health.ClusterDiskSpaceManagerHealthCheck;
 import uk.co.flax.harahachibu.health.ElasticsearchClientHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
@@ -92,6 +93,7 @@ public class DiskSpaceCheckerBuilderTest {
 		assertThat(checker).isInstanceOf(ClusterDiskSpaceChecker.class);
 
 		verify(jersey).register(isA(SetSpaceResource.class));
+		verify(healthChecks).register(isA(String.class), isA(ClusterDiskSpaceManagerHealthCheck.class));
 	}
 
 	@Test(expected=java.lang.ClassNotFoundException.class)

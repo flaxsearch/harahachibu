@@ -46,7 +46,7 @@ public class DiskSpaceCheckerHealthCheck extends HealthCheck {
 			}
 		} catch (DiskSpaceCheckerException e) {
 			LOGGER.warn("DiskSpaceChecker threw exception during healthcheck: {}", e.getMessage());
-			return Result.unhealthy(e.getMessage());
+			return Result.unhealthy(e);
 		}
 	}
 }

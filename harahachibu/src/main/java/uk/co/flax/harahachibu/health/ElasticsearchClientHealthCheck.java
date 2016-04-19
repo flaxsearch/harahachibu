@@ -60,7 +60,7 @@ public class ElasticsearchClientHealthCheck extends HealthCheck {
 			}
 		} catch (DiskSpaceCheckerException e) {
 			LOGGER.error("Exception caught checking ES cluster health: {}", e.getMessage());
-			return Result.unhealthy(e.getMessage());
+			return Result.unhealthy(e);
 		}
 
 		return result;

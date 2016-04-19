@@ -15,6 +15,8 @@
  */
 package uk.co.flax.harahachibu.services.data;
 
+import java.util.Date;
+
 /**
  * POJO representing disk space information.
  *
@@ -24,6 +26,7 @@ public class DiskSpace {
 
 	private final long freeSpace;
 	private final long maxSpace;
+	private final Date creationDate = new Date();
 
 	public DiskSpace(long freeSpace, long maxSpace) {
 		this.freeSpace = freeSpace;
@@ -36,6 +39,10 @@ public class DiskSpace {
 
 	public long getMaxSpace() {
 		return maxSpace;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
 	}
 
 }

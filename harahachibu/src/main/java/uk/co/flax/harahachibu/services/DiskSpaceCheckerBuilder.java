@@ -19,6 +19,7 @@ import io.dropwizard.setup.Environment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
+import uk.co.flax.harahachibu.health.ClusterDiskSpaceManagerHealthCheck;
 import uk.co.flax.harahachibu.health.ElasticsearchClientHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
@@ -70,7 +71,7 @@ public class DiskSpaceCheckerBuilder {
 				checker = new SolrDiskSpaceChecker();
 				break;
 			case DiskSpaceConfiguration.CLUSTER_CHECKER:
-				checker = buildClusterChecker(
+				checker = buildClusterChecker(environment,
 						(List<String>) configuration.getConfiguration().get(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION));
 				break;
 			default:
@@ -97,11 +98,14 @@ public class DiskSpaceCheckerBuilder {
 		return new ElasticsearchDiskSpaceChecker(elasticsearch);
 	}
 
-	private DiskSpaceChecker buildClusterChecker(List<String> servers) {
+	private DiskSpaceChecker buildClusterChecker(Environment environment, List<String> servers) {
 		final ClusterDiskSpaceManager clusterManager = new ClusterDiskSpaceManager(new LinkedHashSet<>(servers));
 
 		// Register the /setSpace endpoint
 		environment.jersey().register(new SetSpaceResource(clusterManager));
+
+		// Add the cluster disk manager health check
+		environment.healthChecks().register("Cluster disk manager", new ClusterDiskSpaceManagerHealthCheck(clusterManager));
 
 		// And build the cluster disk space checker
 		return new ClusterDiskSpaceChecker(clusterManager);
