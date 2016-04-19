@@ -18,6 +18,7 @@ package uk.co.flax.harahachibu;
 import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.setup.Environment;
+import uk.co.flax.harahachibu.health.DiskSpaceCheckerHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
 import uk.co.flax.harahachibu.services.ClusterDiskSpaceManager;
 import uk.co.flax.harahachibu.services.DiskSpaceChecker;
@@ -59,6 +60,9 @@ public class HaraHachiBuApplication extends Application<HaraHachiBuConfiguration
 		ServletRegistration.Dynamic diskSpaceProxyServlet = environment.servlets().addServlet("diskSpaceProxyServlet", new DiskSpaceProxyServlet());
 		diskSpaceProxyServlet.setInitParameter(DiskSpaceProxyServlet.DESTINATION_SERVER_PARAM, config.getProxy().getDestinationServer());
 		diskSpaceProxyServlet.addMapping(DiskSpaceProxyServlet.PROXY_PATH_PREFIX + "/*");
+
+		// Add healthcheck
+		environment.healthChecks().register("Generic disk space checker", new DiskSpaceCheckerHealthCheck(checker));
 	}
 
 	public static void main(String[] args) throws Exception {
