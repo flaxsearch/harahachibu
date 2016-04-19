@@ -69,7 +69,7 @@ public class HaraHachiBuApplicationTest {
 		config.setProxy(proxyConfiguration);
 		config.setDiskSpace(diskSpaceConfiguration);
 		diskSpaceConfiguration.setThreshold("5M");
-		diskSpaceConfiguration.setCheckerType("dummy");
+		diskSpaceConfiguration.setCheckerType("uk.co.flax.harahachibu.services.TestDiskSpaceChecker");
 	}
 
 
