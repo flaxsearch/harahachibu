@@ -37,8 +37,8 @@ server:
 # Proxy configuration details
 proxy:
 
-  # Status code to return when disk is full (default: 500)
-  errorStatus: 500
+  # Status code to return when disk is full (default: 503)
+  errorStatus: 503
 
   # List of URLs which should trigger a disk space check.
   # These are regular expressions, so may use full regex syntax

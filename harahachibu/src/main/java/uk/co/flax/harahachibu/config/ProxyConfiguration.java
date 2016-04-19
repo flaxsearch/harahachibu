@@ -26,7 +26,7 @@ import java.util.List;
  */
 public class ProxyConfiguration {
 
-	private int errorStatus = 500;
+	private int errorStatus = 503;
 
 	@NotNull
 	private String destinationServer;
