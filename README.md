@@ -111,6 +111,11 @@ The endpoint it calls on the application is /setSpace. This will return a JSON-s
 The `status` property may be either "OK" or "ERROR". In the case it returns "ERROR", the message will be populated
 with more details.
 
+**Note:** there are no authentication checks on `/setSpace` at this time.
+We're expecting the app to be running behind a firewall or similar security
+measure - after all, you don't want your search engine open to any passerby,
+do you? :-)
+
 
 ## Using a custom disk space checker
 
