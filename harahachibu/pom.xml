@@ -7,11 +7,17 @@
     <parent>
         <groupId>uk.co.flax</groupId>
         <artifactId>harahachibu-parent</artifactId>
-        <version>0.1</version>
+        <version>0.2</version>
         <relativePath>..</relativePath>
     </parent>
 
     <artifactId>harahachibu</artifactId>
+
+    <name>Hara Hachi Bu</name>
+    <description>
+        A proxy service for checking disk space availability on Solr and
+        Elasticsearch servers.
+    </description>
 
     <properties>
         <!-- Main class for the DW application -->

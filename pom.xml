@@ -6,13 +6,13 @@
     <groupId>uk.co.flax</groupId>
     <artifactId>harahachibu-parent</artifactId>
     <packaging>pom</packaging>
-    <version>0.1</version>
+    <version>0.2</version>
 
     <modules>
         <module>harahachibu</module>
     </modules>
 
-    <name>Hara Hachi Bu</name>
+    <name>Hara Hachi Bu (parent)</name>
     <description>
         A proxy service for checking disk space availability on Solr and
         Elasticsearch servers.
