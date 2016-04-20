@@ -63,7 +63,7 @@ diskSpace:
   #   - solr, for built-in local Solr checker
   #   - cluster, for built-in clustered Solr checker (requires external processes
   #     to pass free space data to application)
-  #   - TODO : Another implementation of uk.co.flax.harahachibu.services.DiskSpaceChecker
+  #   - your own classname to use your own implementation of DiskSpaceChecker
   checkerType: elasticsearch
 
   # The minimum amount of space required on the disk to pass the space check.
@@ -85,9 +85,12 @@ diskSpace:
 
     # Cluster servers - this is a white list of servers in the cluster which
     # may pass disk space settings through. Any other servers will cause an error
-    # (when checkerType == cluster)
+    # (when checkerType == cluster).
+    # Note that these do not have to be actual server names - they correspond to
+    # the server name passed to the /setSpace endpoint.
     clusterServers:
-      - localhost
+      - localhost8983
+      - 192.168.0.2
 
 
 # Logging
