@@ -90,10 +90,15 @@ or
 
     clusterServers:
       - 192.168.0.1
-        192.168.0.2
+      - 192.168.0.2
 
-If the disk checker does not have space details for **all** of the servers in the list, it will automatically return
-a fail status.
+Note that these do not have to be actual server names - they correspond to the
+server names sent to the `/setSpace` endpoint
+([see below](#setting-free-space-for-a-cluster)). Any server names sent to
+`/setSpace` that aren't in the `clusterServers` list will be rejected.
+
+If the disk checker does not have space details for **all** of the servers in 
+the cluster, it will automatically return a fail status.
 
 
 #### Setting free space for a cluster
