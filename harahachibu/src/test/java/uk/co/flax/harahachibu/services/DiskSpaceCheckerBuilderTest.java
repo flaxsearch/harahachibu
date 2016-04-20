@@ -62,6 +62,7 @@ public class DiskSpaceCheckerBuilderTest {
 	@Test
 	public void buildsESChecker() throws Exception {
 		configuration.setCheckerType(DiskSpaceConfiguration.ELASTICSEARCH_CHECKER);
+		configuration.getConfiguration().put(ElasticsearchDiskSpaceChecker.CACHE_MS_CONFIG_OPTION, 5000);
 
 		DiskSpaceChecker checker = builder.build();
 

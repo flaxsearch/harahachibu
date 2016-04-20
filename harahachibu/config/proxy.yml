@@ -79,6 +79,8 @@ diskSpace:
   configuration:
     # Base URL for the Elasticsearch host (when checkerType == elasticsearch)
     baseURL: http://localhost:9200
+    # Time to cache cluster data between calls, in ms (when checkerType == elasticsearch)
+    cacheMs: 5000
 
     # Data directory for the local Solr instance (when checkerType == solr)
     dataDirectory: /data/solr

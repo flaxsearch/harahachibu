@@ -91,9 +91,11 @@ public class DiskSpaceCheckerBuilder {
 
 
 	private DiskSpaceChecker buildElasticsearchChecker(Environment environment) {
+		Integer cacheMsInt = (int) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.CACHE_MS_CONFIG_OPTION);
 		final ElasticsearchClient elasticsearch = new ElasticsearchClient(
 				client,
-				(String) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.BASE_URL_CONFIG_OPTION));
+				(String) configuration.getConfiguration().get(ElasticsearchDiskSpaceChecker.BASE_URL_CONFIG_OPTION),
+				cacheMsInt.longValue());
 		environment.healthChecks().register("Elasticsearch client", new ElasticsearchClientHealthCheck(elasticsearch));
 		return new ElasticsearchDiskSpaceChecker(elasticsearch);
 	}

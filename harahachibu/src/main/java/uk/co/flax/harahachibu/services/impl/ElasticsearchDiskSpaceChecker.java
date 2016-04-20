@@ -33,6 +33,7 @@ import java.util.Map;
 public class ElasticsearchDiskSpaceChecker implements DiskSpaceChecker {
 
 	public static final String BASE_URL_CONFIG_OPTION = "baseURL";
+	public static final String CACHE_MS_CONFIG_OPTION = "cacheMs";
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ElasticsearchDiskSpaceChecker.class);
 

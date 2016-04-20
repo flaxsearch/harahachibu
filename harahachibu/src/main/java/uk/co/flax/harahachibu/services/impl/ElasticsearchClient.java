@@ -37,14 +37,42 @@ public class ElasticsearchClient {
 
 	private final Client client;
 	private final String baseUrl;
+	private final long cacheMs;
 
-	public ElasticsearchClient(Client client, String baseUrl) {
+	private ElasticsearchClusterStats latestStats;
+	private long lastUpdate;
+
+	private final Object statsLock = new Object();
+
+	public ElasticsearchClient(Client client, String baseUrl, long cacheMs) {
 		this.client = client;
 		this.baseUrl = baseUrl;
+		this.cacheMs = cacheMs;
 	}
 
 	public ElasticsearchClusterStats getClusterStats() throws DiskSpaceCheckerException {
+		final ElasticsearchClusterStats stats;
+
+		if (cacheUpToDate()) {
+			stats = latestStats;
+		} else {
+			stats = getRemoteClusterStats();
+			synchronized (statsLock) {
+				this.latestStats = stats;
+				this.lastUpdate = System.currentTimeMillis();
+			}
+		}
+
+		return stats;
+	}
+
+	private boolean cacheUpToDate() {
+		return latestStats != null && lastUpdate > (System.currentTimeMillis() - cacheMs);
+	}
+
+	private ElasticsearchClusterStats getRemoteClusterStats() throws DiskSpaceCheckerException {
 		try {
+			LOGGER.debug("Retrieving stats from cluster");
 			return client.target(baseUrl + CLUSTER_STATS_ENDPOINT)
 					.request(MediaType.APPLICATION_JSON)
 					.buildGet()

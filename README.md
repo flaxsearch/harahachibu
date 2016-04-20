@@ -54,10 +54,12 @@ the [DropWizard manual](http://www.dropwizard.io/0.9.2/docs/manual/configuration
 
 ### Elasticsearch configuration
 
-To configure the Elasticsearch disk space checker, the `configuration` map needs a single property:
+To configure the Elasticsearch disk space checker, the `configuration` map needs two properties:
 
 - `baseURL` - the base URL for the ElasticSearch server (eg. `http://localhost:9200`). When checking, this will be
 used as the root of the cluster statistics URL (eg. `http://localhost:9200/cluster/_stats`).
+- `cacheMs` - the time, in milliseconds, to cache the Elasticsearch cluster results. The call to the cluster
+stats URL may slow down your requests, so caching the data will reduce the number of times the request is made.
 
 
 ### Local Solr configuration

@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockserver.client.server.MockServerClient;
 import org.mockserver.model.Header;
 import org.mockserver.model.JsonBody;
+import org.mockserver.verify.VerificationTimes;
 import uk.co.flax.harahachibu.services.data.ElasticsearchClusterStats;
 
 import javax.servlet.http.HttpServletResponse;
@@ -44,7 +45,7 @@ import static org.mockserver.model.HttpResponse.response;
 
 /**
  * Unit tests for the ElasticsearchClient class.
- *
+ * <p>
  * Created by mlp on 15/04/16.
  */
 public class ElasticsearchClientTest {
@@ -52,6 +53,7 @@ public class ElasticsearchClientTest {
 	private static final int MIN_PORT = 12000;
 	private static final int MAX_PORT = 65535;
 	private static final String BASIC_JSON_FILE = "/esDiskSpaceChecker/spaceFree.json";
+	private static final long cacheMs = 1500L;
 
 	private static String clusterStatsJson;
 
@@ -63,8 +65,6 @@ public class ElasticsearchClientTest {
 
 	private MockServerClient mockServer;
 	private ElasticsearchClient esClient;
-
-	private Client client;
 
 	@BeforeClass
 	public static void initialiseJson() {
@@ -81,16 +81,16 @@ public class ElasticsearchClientTest {
 	@Before
 	public void setup() {
 		when(environment.lifecycle()).thenReturn(lifecycleEnvironment);
-		client = builder.using(environment).build("esClientTest");
+		Client client = builder.using(environment).build("esClientTest");
 
 		// Start the mock server
 		mockServer = startClientAndServer(port);
 
 		// Initialise the ES client
-		esClient = new ElasticsearchClient(client, "http://localhost:" + port);
+		esClient = new ElasticsearchClient(client, "http://localhost:" + port, cacheMs);
 	}
 
-	@Test(expected=uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
+	@Test(expected = uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
 	public void throwsExceptionWhenServerReturns404() throws Exception {
 		mockServer.when(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT))
 				.respond(response()
@@ -99,7 +99,7 @@ public class ElasticsearchClientTest {
 		esClient.getClusterStats();
 	}
 
-	@Test(expected=uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
+	@Test(expected = uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
 	public void throwsExceptionWhenServerReturnsNonsense() throws Exception {
 		mockServer.when(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT))
 				.respond(response()
@@ -109,13 +109,13 @@ public class ElasticsearchClientTest {
 		esClient.getClusterStats();
 	}
 
-	@Test(expected=uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
+	@Test(expected = uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
 	public void throwsExceptionWhenServerNotRunning() throws Exception {
 		mockServer.stop();
 		esClient.getClusterStats();
 	}
 
-	@Test(expected=uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
+	@Test(expected = uk.co.flax.harahachibu.services.DiskSpaceCheckerException.class)
 	public void throwsExceptionWhenServerTimesOut() throws Exception {
 		// Default DW Jersey client timeout is 500ms
 		mockServer.when(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT))
@@ -142,6 +142,63 @@ public class ElasticsearchClientTest {
 		assertThat(clusterStats.getNodes().getFileSystem().getTotalBytes()).isEqualTo(206289465344L);
 		assertThat(clusterStats.getNodes().getFileSystem().getFreeBytes()).isEqualTo(132861665280L);
 		assertThat(clusterStats.getNodes().getFileSystem().getAvailableBytes()).isEqualTo(122359132160L);
+	}
+
+	@Test
+	public void serverCalledOnceInCacheTime() throws Exception {
+		mockServer.when(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT))
+				.respond(response()
+						.withBody(new JsonBody(clusterStatsJson))
+						.withHeaders(new Header("Content-Type", "application/json"))
+						.withStatusCode(HttpServletResponse.SC_OK));
+
+		ElasticsearchClusterStats clusterStats = esClient.getClusterStats();
+		assertThat(clusterStats).isNotNull();
+		assertThat(clusterStats.getStatus()).isEqualTo("red");
+		assertThat(clusterStats.getNodes().getFileSystem().getTotalBytes()).isEqualTo(206289465344L);
+		assertThat(clusterStats.getNodes().getFileSystem().getFreeBytes()).isEqualTo(132861665280L);
+		assertThat(clusterStats.getNodes().getFileSystem().getAvailableBytes()).isEqualTo(122359132160L);
+
+		// Call again, should hit cache
+		clusterStats = esClient.getClusterStats();
+		assertThat(clusterStats).isNotNull();
+		assertThat(clusterStats.getStatus()).isEqualTo("red");
+		assertThat(clusterStats.getNodes().getFileSystem().getTotalBytes()).isEqualTo(206289465344L);
+		assertThat(clusterStats.getNodes().getFileSystem().getFreeBytes()).isEqualTo(132861665280L);
+		assertThat(clusterStats.getNodes().getFileSystem().getAvailableBytes()).isEqualTo(122359132160L);
+
+		// Verify mockServer calls
+		mockServer.verify(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT), VerificationTimes.once());
+	}
+
+	@Test
+	public void serverCalledTwiceOutsideCacheTime() throws Exception {
+		mockServer.when(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT))
+				.respond(response()
+						.withBody(new JsonBody(clusterStatsJson))
+						.withHeaders(new Header("Content-Type", "application/json"))
+						.withStatusCode(HttpServletResponse.SC_OK));
+
+		ElasticsearchClusterStats clusterStats = esClient.getClusterStats();
+		assertThat(clusterStats).isNotNull();
+		assertThat(clusterStats.getStatus()).isEqualTo("red");
+		assertThat(clusterStats.getNodes().getFileSystem().getTotalBytes()).isEqualTo(206289465344L);
+		assertThat(clusterStats.getNodes().getFileSystem().getFreeBytes()).isEqualTo(132861665280L);
+		assertThat(clusterStats.getNodes().getFileSystem().getAvailableBytes()).isEqualTo(122359132160L);
+
+		// Paused to allow cache to expire
+		Thread.sleep(cacheMs);
+
+		// Call again, should *not* hit cache
+		clusterStats = esClient.getClusterStats();
+		assertThat(clusterStats).isNotNull();
+		assertThat(clusterStats.getStatus()).isEqualTo("red");
+		assertThat(clusterStats.getNodes().getFileSystem().getTotalBytes()).isEqualTo(206289465344L);
+		assertThat(clusterStats.getNodes().getFileSystem().getFreeBytes()).isEqualTo(132861665280L);
+		assertThat(clusterStats.getNodes().getFileSystem().getAvailableBytes()).isEqualTo(122359132160L);
+
+		// Verify mockServer calls
+		mockServer.verify(request().withPath(ElasticsearchClient.CLUSTER_STATS_ENDPOINT), VerificationTimes.exactly(2));
 	}
 
 }
