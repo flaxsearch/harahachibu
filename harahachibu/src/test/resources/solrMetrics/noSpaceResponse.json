@@ -1,0 +1,24 @@
+{
+  "responseHeader": {
+    "status": 0,
+    "QTime": 3
+  },
+  "metrics": {
+    "solr.core.gettingstarted.shard2.replica_n4": {
+      "CORE.collection": "gettingstarted",
+      "CORE.coreName": "gettingstarted_shard2_replica_n4",
+      "CORE.fs.path": "/home/mlp/apps/solr-7.5.0/example/cloud/node1/solr/gettingstarted_shard2_replica_n4/data",
+      "CORE.fs.spins": false,
+      "CORE.fs.totalSpace": 201451704320,
+      "CORE.fs.usableSpace": 0
+    },
+    "solr.core.gettingstarted.shard1.replica_n1": {
+      "CORE.collection": "gettingstarted",
+      "CORE.coreName": "gettingstarted_shard1_replica_n1",
+      "CORE.fs.path": "/home/mlp/apps/solr-7.5.0/example/cloud/node1/solr/gettingstarted_shard1_replica_n1/data",
+      "CORE.fs.spins": false,
+      "CORE.fs.totalSpace": 201451704320,
+      "CORE.fs.usableSpace": 0
+    }
+  }
+}

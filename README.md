@@ -43,9 +43,10 @@ the [DropWizard manual](http://www.dropwizard.io/0.9.2/docs/manual/configuration
     `http://localhost:8983` or `http://localhost:9200`. HTTPS is not currently supported.
     
 - `diskSpace` - contains configuration for the disk space checker:
-	- `checkerType` indicates the type of checker to run. This can be `elasticsearch`, `solr` or `cluster`, to
-	check Elasticsearch (using the `/cluster/_stats` endpoint), a local Solr instance, or a clustered Solr instance
-	(more details below).
+	- `checkerType` indicates the type of checker to run. This can be `elasticsearch`, `solr`, `cluster`
+	or `solrmetrics`, to
+	check Elasticsearch (using the `/cluster/_stats` endpoint), a local Solr instance, a clustered Solr instance
+	(more details below), or a Solr cluster via the Metrics API.
 	- `threshold` indicates the minimum space that should be available on the file system in order for a request to
 	pass. This may be given as a percentage, or using K, M or G as suffixes for kilobytes, megabytes or gigabytes
 	respectively - ie. `5%`, `4G`.
@@ -68,6 +69,24 @@ To configure the local Solr disk space checker, the `configuration` map needs to
 directory using the following property:
 
 - `dataDirectory` - (eg. `/data/solr/myDocuments`). This will be used to check the local filesystem for free space.
+
+
+### Solr Metrics configuration
+
+To configure the Solr Metrics configuration, the `configuration` map
+needs to be given the following properties:
+
+- `solrUrl` - the base URL for the Solr instance (eg. `http://localhost:8983`).
+When checking, this will be used as the root of the metrics API URL.
+- `collection` - the collection whose node file systems should be
+checked.
+
+This configuration will only work with Solr instances where the metrics
+API is available - eg. Solr 7.x forwards.
+
+The URL built will use filter parameters to keep the response as small
+as possible. (For those interested, the URL looks something like
+`http://localhost:8983/solr/admin/metrics?prefix=CORE.fs&prefix=CORE.collection&prefix=CORE.coreName`)
 
 
 ### Clustered Solr configuration

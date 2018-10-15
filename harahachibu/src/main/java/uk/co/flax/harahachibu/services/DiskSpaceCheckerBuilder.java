@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2016 Lemur Consulting Ltd.
  * <p/>
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,10 +22,7 @@ import uk.co.flax.harahachibu.config.DiskSpaceConfiguration;
 import uk.co.flax.harahachibu.health.ClusterDiskSpaceManagerHealthCheck;
 import uk.co.flax.harahachibu.health.ElasticsearchClientHealthCheck;
 import uk.co.flax.harahachibu.resources.SetSpaceResource;
-import uk.co.flax.harahachibu.services.impl.ClusterDiskSpaceChecker;
-import uk.co.flax.harahachibu.services.impl.ElasticsearchClient;
-import uk.co.flax.harahachibu.services.impl.ElasticsearchDiskSpaceChecker;
-import uk.co.flax.harahachibu.services.impl.SolrDiskSpaceChecker;
+import uk.co.flax.harahachibu.services.impl.*;
 
 import javax.ws.rs.client.Client;
 import java.util.LinkedHashSet;
@@ -73,6 +70,9 @@ public class DiskSpaceCheckerBuilder {
 			case DiskSpaceConfiguration.CLUSTER_CHECKER:
 				checker = buildClusterChecker(environment,
 						(List<String>) configuration.getConfiguration().get(ClusterDiskSpaceChecker.CLUSTER_SERVERS_CONFIG_OPTION));
+				break;
+			case DiskSpaceConfiguration.SOLR_METRICS_CHECKER:
+				checker = new SolrMetricsDiskSpaceChecker();
 				break;
 			default:
 				checker = buildCustomChecker(configuration.getCheckerType());
